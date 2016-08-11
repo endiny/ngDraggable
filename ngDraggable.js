@@ -31,7 +31,8 @@ angular.module("ngDraggable", [])
                 var _releaseEvents = 'touchend mouseup';
                 var _dragHandle;
                 var minRadius = parseInt(attrs.ngDragMinRadius) || 0;
-                var startX, startY;
+                var _startX, _startY;
+                var _hasStarted;
 
                 // to identify the element in order to prevent getting superflous events when a single element has both drag and drop directives on it.
                 var _myid = scope.$id;
@@ -151,8 +152,9 @@ angular.module("ngDraggable", [])
                         _dragOffset = {left:document.body.scrollLeft, top:document.body.scrollTop};
                     }
 
-                    startX = evt.clientX;
-                    startY = evt.clientY;
+                    _hasStarted = true;
+                    _startX = evt.clientX;
+                    _startY = evt.clientY;
 
                     element.centerX = element[0].offsetWidth / 2;
                     element.centerY = element[0].offsetHeight / 2;
@@ -182,8 +184,11 @@ angular.module("ngDraggable", [])
 
                 var onmove = function (evt) {
                     if (!_dragEnabled)return;
-                    if ((Math.sqrt(Math.pow(startX-evt.clientX, 2) + Math.pow(startY-evt.clientY, 2))) < minRadius)
+                    if (_hasStarted && (Math.sqrt(Math.pow(_startX - evt.clientX, 2) + Math.pow(_startY - evt.clientY, 2))) < minRadius) {
                         return;
+                    }
+                    _hasStarted = false;
+
                     evt.preventDefault();
 
                     if (!element.hasClass('dragging')) {
@@ -208,7 +213,6 @@ angular.module("ngDraggable", [])
                         _tx = _mx - _mrx - _dragOffset.left;
                         _ty = _my - _mry - _dragOffset.top;
                     }
-
                     moveElement(_tx, _ty);
 
                     $rootScope.$broadcast('draggable:move', { x: _mx, y: _my, tx: _tx, ty: _ty, event: evt, element: element, data: _data, uid: _myid, dragOffset: _dragOffset });
