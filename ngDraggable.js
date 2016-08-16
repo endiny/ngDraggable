@@ -30,6 +30,7 @@ angular.module("ngDraggable", [])
                 var _moveEvents = 'touchmove mousemove';
                 var _releaseEvents = 'touchend mouseup';
                 var _dragHandle;
+                var _boundToCursor = !!attrs.ngDragCursor || false;
                 var minRadius = parseInt(attrs.ngDragMinRadius) || 0;
                 var _startX, _startY;
                 var _hasStarted;
@@ -167,8 +168,8 @@ angular.module("ngDraggable", [])
                         _tx = _mx - element.centerX - $window.pageXOffset;
                         _ty = _my - element.centerY - $window.pageYOffset;
                     } else {
-                        _tx = _mx - _mrx - $window.pageXOffset;
-                        _ty = _my - _mry - $window.pageYOffset;
+                        _tx = _mx - _mrx * !_boundToCursor - $window.pageXOffset;
+                        _ty = _my - _mry * !_boundToCursor - $window.pageYOffset;
                     }
 
                     $document.on(_moveEvents, onmove);
@@ -210,8 +211,8 @@ angular.module("ngDraggable", [])
                         _tx = _mx - element.centerX - _dragOffset.left;
                         _ty = _my - element.centerY - _dragOffset.top;
                     } else {
-                        _tx = _mx - _mrx - _dragOffset.left;
-                        _ty = _my - _mry - _dragOffset.top;
+                        _tx = _mx - _mrx * !_boundToCursor - _dragOffset.left;
+                        _ty = _my - _mry * !_boundToCursor - _dragOffset.top;
                     }
                     moveElement(_tx, _ty);
 
